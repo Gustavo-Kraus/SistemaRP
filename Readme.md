@@ -8,3 +8,6 @@ Para fazer ele funcionar é bem complicado já adiantando, mas posso ajudar!
 
 ![Sem título](https://github.com/Gustavo-Kraus/SistemaRP/assets/96898200/75d0b25a-e17c-48da-9e7c-b948f40d0d2e)
 
+![image](https://github.com/Gustavo-Kraus/SistemaRP/assets/96898200/f6eb2eb2-425c-49bd-9c06-d5507f586d6f)
+
+Todos os campos de busca estão funcionando e filtrando por todas as informações!
