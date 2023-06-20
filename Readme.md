@@ -6,3 +6,4 @@ Qualquer sugestão ou critica estou pode me encaminhar que vou ficar muito agrad
 Caso alguém tiver alguma dúvida sobre o código pode me encaminhar que eu respondo explicando.
 Para fazer ele funcionar é bem complicado já adiantando, mas posso ajudar!
 
+https://github.com/Gustavo-Kraus/SistemaRP/issues/1#issue-1764587585
