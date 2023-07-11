@@ -11,6 +11,13 @@ def adicionar_registro(financeiro):
     count = database.cursor.execute(query, params).rowcount
     database.cnxn.commit()
 
+def alterar_registro(cliente_id, financeiroRecuperado, novo_valor, novo_valor_pago, nova_data_validade, novas_observacoes):
+    query = "UPDATE TabelaFinanceiro SET cliente_id = ?, valor = ?, valor_pago = ?, data_validade = ?, observacoes = ? WHERE id = ?"
+    params = (cliente_id, novo_valor, novo_valor_pago, nova_data_validade, novas_observacoes, financeiroRecuperado.id)
+
+    count = database.cursor.execute(query, params).rowcount
+    database.cnxn.commit()
+
 
 
 def SelecionarTodos():
@@ -26,17 +33,21 @@ def SelecionarTodos():
 
 def excluir_registro(id_registro):
     query = "DELETE FROM TabelaFinanceiro WHERE id = ?"
-    params = (id_registro,)
+    params = (id_registro)
     
     count = database.cursor.execute(query, params).rowcount
     database.cnxn.commit()
 
-def alterar_registro(id_financeiro, novo_valor, novo_valor_pago, nova_data_validade, novas_observacoes):
-    query = "UPDATE TabelaFinanceiro SET valor = ?, valor_pago = ?, data_validade = ?, observacoes = ? WHERE cliente_id = ?"
-    params = (novo_valor, novo_valor_pago, nova_data_validade, novas_observacoes, id_financeiro)
+def SelecionarById(id):
+    database.cursor.execute("SELECT * FROM TabelaFinanceiro WHERE ID = ?", id)
+    costumerList = []
 
-    count = database.cursor.execute(query, params).rowcount
-    database.cnxn.commit()
+    for row in database.cursor.fetchall():
+        costumerList.append(Financeiro.Financeiro(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    
+    return costumerList[0]
+
+
 
 def ultimoid():
     database.cursor.execute("SELECT MAX(id) FROM TabelaFinanceiro ")

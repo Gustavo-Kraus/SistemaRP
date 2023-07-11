@@ -1,6 +1,7 @@
 from typing import List
 import services.database as db
 import models.Produtos as produto
+import models.Produtos_ultimoid as teste
 
 def IncluirProdutos (Produto):
     count = db.cursor.execute("""
@@ -18,3 +19,23 @@ def SelecionarTodos():
         produtosList.append(produto.Produtos(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
     
     return produtosList
+
+def ultimoid():
+    db.cursor.execute("SELECT MAX(id) FROM dadosprodutos ")
+    testeList = []
+    for row in db.cursor.fetchall():
+        testeList.append(teste.Produtos(row[0]))
+    return testeList
+
+def ultimomaisum():
+    for item in ultimoid():
+            id_agora = item.id
+            id_soma = 1
+            soma = id_agora + id_soma
+            return soma
+    
+def excluir(id):
+    count = db.cursor.execute("""
+    DELETE FROM dadosprodutos WHERE id = ?""",
+    id).rowcount
+    db.cnxn.commit()

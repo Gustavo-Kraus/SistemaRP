@@ -1,98 +1,111 @@
-from os import write
-from numpy.core.fromnumeric import size
 import streamlit as st
-import controllers.ClienteController as ClienteController
-import models.Cliente_Pesquisa as clientes
-import pandas as pd
-import pages.CadastrarCliente as PageCadastrarCliente
-import pages.ConsultarCliente as PageConsultarCliente
-import pages.Produtos.CadastrarProdutos as PageCadastrarProdutos
-import pages.Produtos.ConsultarProdutos as PageConsultarProdutos
-import pages.Fornecedores.CadastrarFornecedores as PageCadastrarFornecedor
-import pages.Fornecedores.ConsultarFornecedores as PageConsultarFornecedor
-import pages.CadastrarFinanceiro as PageCadastrarFinanceiro
-import pages.ConsultarFinanceiro as PageConsultarFinanceiro
-import streamlit_authenticator as stauth
-import pickle
-from pathlib import Path
+from pages.Cliente import CadastrarCliente, ConsultarCliente
+from pages.Financeiro import CadastrarFinanceiro, ConsultarFinanceiro
+from pages.Fornecedores import CadastrarFornecedores, ConsultarFornecedores
+from pages.Produtos import ConsultarProdutos, CadastrarProdutos
 
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
 
-    st.write("# Bem Vindo!")
-
-    st.sidebar.success("teste")
-
-if __name__ == "__main__":
-    run()
+# Dicionário de usuários e permissões permitidas
+usuarios_permitidos = {
+    "gu": {
+        "senha": "123",
+        "permissoes": ["bar1", "bar2"]
+    },
+    "gu2": {
+        "senha": "123",
+        "permissoes": ["bar1"]
+    }
+}
 
 st.set_page_config(layout="wide")
 
-# --- USER AUTHENTICATION ---
-nomes = ["Gustavo"]
-usernames = ["Gustavo"]
+# Função auxiliar para atualizar a sessão
+def update_session_state(**kwargs):
+    for key, value in kwargs.items():
+        setattr(st.session_state, key, value)
 
-file_path = Path(__file__).parent / "hashed_pw.pkl"
-with file_path.open("rb") as file:
-    hashed_password = pickle.load(file)
+# Página de login
+def login():
+    st.title("Login")
 
-authentication = stauth.Authenticate(nomes, usernames, hashed_password,
-    "teste", "teste", cookie_expiry_days=5)
+    with st.form(key="login_form"):
+        username = st.text_input("Usuário")
+        password = st.text_input("Senha", type="password")
 
-nome, authentication_status, username = authentication.login("Login", "main")
+        login_message = st.empty()  # Espaço para exibir mensagem de erro/sucesso
 
-def cadastrar():
-    for item in ClienteController.todosclientes():
-        id_agora = item.id
-        
-def cadastrar():
-    for item in ClienteController.ultimoid():
-        ultimo = item.id
+        submit_button = st.form_submit_button("Entrar")
 
+        if submit_button:
+            if username in usuarios_permitidos and usuarios_permitidos[username]["senha"] == password:
+                update_session_state(logged_in=True, username=username)
+            else:
+                login_message.error("Usuário ou senha inválidos")
 
+# Página inicial
+def home():
+    st.title("Olá, " + st.session_state.username)
 
-if authentication_status == False:
-    st.error("Nome ou senha está incorreto")
+st.sidebar.title("Menu")
 
-if authentication_status == nome:
-    st.warning("Por favor preencha os campos!")
+if 'logged_in' not in st.session_state or not st.session_state.logged_in:
+    login()
+else:
+    # Exibir botão de logout na barra lateral
+    if st.sidebar.button("Logout"):
+        update_session_state(logged_in=False, username=None)
+        st.experimental_rerun()
 
-if authentication_status:
-    bar = st.sidebar
-    st.sidebar.title(f"Bem vindo {nome}")
+    home()
 
+    # Exibir conteúdo da barra lateral quando logado
+    bar1_allowed = False
+    bar2_allowed = False
 
-'''   container = st.container()
-    a = container.columns(1)
-    CadastroCliente = bar.selectbox(
-        'Clientes',
-        ['','Cadastrar Cliente', 'Consultar Clientes']
-    )
+    if st.session_state.username in usuarios_permitidos:
+        user_permissions = usuarios_permitidos[st.session_state.username]["permissoes"]
+        if "bar1" in user_permissions:
+            bar1_allowed = True
+        if "bar2" in user_permissions:
+            bar2_allowed = True
 
-    container = st.container()
-    a = container.columns(1)
-    CadastroFinanceiro = bar.selectbox(
-        'Financeiro',
-        ['','Criar Financeiro', 'Consultar Financeiro']
-    )
+    bar = st.sidebar.selectbox('Cadastro', ['', 'Clientes','Adicionar Cliente', 'Produtos', 'Adicionar Produtos' ,'Fornecedores', 'Adicionar Fornecedor' ] if bar1_allowed else [''])
+    bar2 = st.sidebar.selectbox('Financeiro', ['', 'Financeiro', 'Cadastrar Financeiro'] if bar2_allowed else [''])
 
+    mostrar_cadastrar_cliente = False
 
-    if CadastroCliente == 'Cadastrar Cliente':
-        PageCadastrarCliente.cadastrar()
+    if bar == 'Cadastrar Cliente':
+        st.experimental_set_query_params()
+        mostrar_cadastrar_cliente = True
 
-    if CadastroCliente == 'Consultar Clientes':
-        PageConsultarCliente.list()
+    if mostrar_cadastrar_cliente:
+        CadastrarCliente.cadastrar()
 
-    if CadastroFinanceiro == 'Criar Financeiro':
-        PageCadastrarFinanceiro.financeiro()
-
-    if CadastroFinanceiro == 'Consultar Financeiro':
-        PageConsultarFinanceiro.consultar_financeiro()
-
-    authentication.logout("Deslogar", "sidebar" )
+    if bar == 'Clientes':
+        ConsultarCliente.ConsultarCliente()
     
-'''
+    if bar == 'Adicionar Cliente':
+        CadastrarCliente.cadastrar()
 
+    if bar == 'Adicionar Produtos':
+        CadastrarProdutos.cadastrar()
+
+    if bar == 'Produtos':
+        ConsultarProdutos.consultar()
+
+    if bar == 'Fornecedores':
+        ConsultarFornecedores.Consultar()
+
+    if bar == 'Adicionar Fornecedor':
+        CadastrarFornecedores.cadastrar()
+
+    if bar2 == 'Cadastrar Financeiro':
+        st.experimental_set_query_params()
+        CadastrarFinanceiro.CadastrarFinanceiro()
+
+    if bar2 == 'Financeiro':
+        ConsultarFinanceiro.ConsultarFinanceiro()
+
+
+    # Espaço em branco no lugar da barra lateral quando não logado
+    st.sidebar.empty()

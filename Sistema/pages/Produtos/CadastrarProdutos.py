@@ -1,14 +1,12 @@
 import streamlit as st
 import controllers.ProdutosController as ProdutosController
 import models.Produtos as produto
-import pandas as pd
 
 
 def cadastrar():
         st.title('Cadastrar produto')
         with st.form(key="Estoque"):
             st.subheader('Geral')
-            input_id = st.number_input(label="id", format="%d", step=1)
             input_nome_produto = st.text_input(label="Nome do produto")
             input_cod_barras = st.text_input(label="Código de Barras")
             input_quantidade = st.number_input(label="Quantidade", format="%d", step=1)
@@ -20,7 +18,7 @@ def cadastrar():
             input_preco_venda = st.text_input(label="Preço de Venda")
             input_button_submit = st.form_submit_button("Cadastrar")
             if input_button_submit:
-                produto.id = input_id
+                produto.id = ProdutosController.ultimomaisum()
                 produto.nome = input_nome_produto
                 produto.barras = input_cod_barras
                 produto.quantidade = input_quantidade

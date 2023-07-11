@@ -1,10 +1,8 @@
 import streamlit as st
-import pandas as pd
-from json import loads
-from pandas import read_csv
-from pandas import read_excel
 import streamlit_authenticator as stauth
 import pickle
+from pathlib import Path
+
 
 # --- USER AUTHENTICATION ---
 nomes = ["TesteLogin"]
@@ -16,7 +14,7 @@ with file_path.open("rb") as file:
     hashed_password = pickle.load(file)
 
 authentication = stauth.Authenticate(nomes, usernames, hashed_password,
-    "Main", cookie_expiry_days=30)
+    "Main", cookie_expiry_days=0)
 
 nome, authentication_status, username = authentication.login("Login", "Main")
 
@@ -25,8 +23,6 @@ if authentication_status == False:
 
 if authentication_status == nome:
     st.warning("Por favor preencha os campos!")
-
-if a
 
 st.title('*Olá, seja muito bem vindo*')
 st.write('Coloque sua credenciais')
